@@ -15,23 +15,54 @@ goal = [
 ]
 
 # test nodes (for testing)
-# t1 = [
-#     [8,1,3],
-#     [4,0,2],
-#     [7,5,6]
-# ]
-#
-# t2 = [
-#     [1,8,3],
-#     [4,0,2],
-#     [7,6,5]
-# ]
-#
-# t3 = [
-#     [8,1,3],
-#     [4,0,2],
-#     [7,5,6]
-# ]
+t1 = [
+    [0,1,3],
+    [4,8,2],
+    [7,5,6]
+]
+
+t2 = [
+    [1,0,3],
+    [4,8,2],
+    [7,6,5]
+]
+
+t3 = [
+    [8,1,0],
+    [4,3,2],
+    [7,5,6]
+]
+
+t4 = [
+    [8,1,2],
+    [4,3,0],
+    [7,5,6]
+]
+
+t5 = [
+    [8,1,2],
+    [0,3,4],
+    [7,5,6]
+]
+
+t6 = [
+    [8,1,2],
+    [7,3,4],
+    [0,5,6]
+]
+
+t7 = [
+    [8,1,2],
+    [7,3,4],
+    [5,0,6]
+]
+
+t8 = [
+    [8,1,2],
+    [7,3,4],
+    [5,6,0]
+]
+
 
 class Node:
     def __init__(self, board=[[0 for x in range(W)] for y in range(H)], moves=0, priority=0, prev=None):
@@ -82,10 +113,13 @@ def generateNeighbours(board):
         y1 += 1
         if y1 <= H-1:
             element = board[x1][y1]
-            newBoard = board
+            newBoard = list(map(list, board))
             newBoard[x1][y1] = 0
             newBoard[x][y] = element
+            print("FROM HORI-RIGHT")
+            print(newBoard)
             neighbourList.append(newBoard)
+            break
         else:
             break
 
@@ -95,10 +129,13 @@ def generateNeighbours(board):
         y1 -= 1
         if y1 >= 0:
             element = board[x1][y1]
-            newBoard = board
+            newBoard = list(map(list, board))
             newBoard[x1][y1] = 0
             newBoard[x][y] = element
+            print("FROM HORI-LEFT")
+            print(newBoard)
             neighbourList.append(newBoard)
+            break
         else:
             break
 
@@ -108,10 +145,13 @@ def generateNeighbours(board):
         x1 += 1
         if x1 <= W-1:
             element = board[x1][y1]
-            newBoard = board
+            newBoard = list(map(list, board))
             newBoard[x1][y1] = 0
             newBoard[x][y] = element
+            print("FROM VER-UP")
+            print(newBoard)
             neighbourList.append(newBoard)
+            break
         else:
             break
 
@@ -121,31 +161,65 @@ def generateNeighbours(board):
         x1 -= 1
         if x1 >= 0:
             element = board[x1][y1]
-            newBoard = board
+            newBoard = list(map(list, board))
             newBoard[x1][y1] = 0
             newBoard[x][y] = element
+            print("FROM VER-DOWN")
+            print(newBoard)
             neighbourList.append(newBoard)
+            break
         else:
             break
 
     return neighbourList
 
-# main script runs from here ----
+#Manhattan priority function
+def calculatePriority(board, moves=0):
+    #pick each element and calculate distance
+    x1, y1 = 0, 0
+    x2, y2 = 0, 0
+    totalDiff = 0
+    # loop over test board
+    for i1 in range(len(board)):
+        for j1 in range(len(board[i1])):
+            if board[i1][j1] != 0:
+                # loop over goal board to find the item's pos
+                for i2 in range(len(goal)):
+                    for j2 in range(len(goal[i2])):
+                        if goal[i2][j2] == board[i1][j1]:
+                            totalDiff += abs(i1-i2) + abs(j1-j2)
+
+    return totalDiff + moves
+
+# compare with goal node
+def compare(board):
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            if board[i][j] != goal[i][j]:
+                return False
+    return True
+
 def main():
-    print(generateNeighbours(initial))
-    # priorityQueue = PriorityQueue()
-    # n1 = Node(t1, 0, 3, t2)
-    # n2 = Node(t2, 0, 1, t3)
-    # n3 = Node(t3, 0, 2, t1)
-    #
-    # priorityQueue.enqueue(n1)
-    # priorityQueue.enqueue(n2)
-    # priorityQueue.enqueue(n3)
-    #
-    # while not priorityQueue.isEmpty():
-    #     node = priorityQueue.dequeue()
-    #     # insert neighbouring nodes
-    #     # check if node == goal
-    #     print(node.board)
+    # initial node insert
+    priorityQueue = PriorityQueue()
+    moves = 0
+    priority = calculatePriority(initial, moves)
+    initNode = Node(initial, moves, priority, None)
+    priorityQueue.enqueue(initNode)
+
+    while not priorityQueue.isEmpty():
+        node = priorityQueue.dequeue()
+        print("Dequeue priority: ", node.priority)
+        if compare(node.board) == True:
+            break
+
+        neighbourList = generateNeighbours(node.board)
+        moves += 1
+        for i in range(len(neighbourList)):
+            newNode = Node(neighbourList[i], moves, calculatePriority(neighbourList[i], moves),None)
+            priorityQueue.enqueue(newNode)
+
+
+    print("Moves: ", moves)
 
 main()

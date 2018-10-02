@@ -1,17 +1,19 @@
+from __future__ import print_function
+
 W,H = 3,3
 
 # initial state (generate randomly)
 initial = [
-    [8,1,3],
-    [4,0,2],
-    [7,6,5]
+    [1,2,3],
+    [5,6,0],
+    [7,8,4]
 ]
 
 # goal to reach
 goal = [
     [1,2,3],
-    [4,5,6],
-    [7,8,0]
+    [5,8,6],
+    [0,7,4]
 ]
 
 # test nodes (for testing)
@@ -94,7 +96,6 @@ class PriorityQueue:
             print()
             exit()
 
-
 # function to generate neighbouring nodes
 def generateNeighbours(board):
     #locate the blank
@@ -116,8 +117,8 @@ def generateNeighbours(board):
             newBoard = list(map(list, board))
             newBoard[x1][y1] = 0
             newBoard[x][y] = element
-            print("FROM HORI-RIGHT")
-            print(newBoard)
+            # print("FROM HORI-RIGHT")
+            # print(newBoard)
             neighbourList.append(newBoard)
             break
         else:
@@ -132,8 +133,8 @@ def generateNeighbours(board):
             newBoard = list(map(list, board))
             newBoard[x1][y1] = 0
             newBoard[x][y] = element
-            print("FROM HORI-LEFT")
-            print(newBoard)
+            # print("FROM HORI-LEFT")
+            # print(newBoard)
             neighbourList.append(newBoard)
             break
         else:
@@ -148,8 +149,8 @@ def generateNeighbours(board):
             newBoard = list(map(list, board))
             newBoard[x1][y1] = 0
             newBoard[x][y] = element
-            print("FROM VER-UP")
-            print(newBoard)
+            # print("FROM VER-UP")
+            # print(newBoard)
             neighbourList.append(newBoard)
             break
         else:
@@ -164,8 +165,8 @@ def generateNeighbours(board):
             newBoard = list(map(list, board))
             newBoard[x1][y1] = 0
             newBoard[x][y] = element
-            print("FROM VER-DOWN")
-            print(newBoard)
+            # print("FROM VER-DOWN")
+            # print(newBoard)
             neighbourList.append(newBoard)
             break
         else:
@@ -199,27 +200,45 @@ def compare(board):
                 return False
     return True
 
+
+def printMatrix(board):
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            print(board[i][j], end=" ")
+        print("\n")
+
+
 def main():
-    # initial node insert
-    priorityQueue = PriorityQueue()
+
+    currentBoard = initial
     moves = 0
-    priority = calculatePriority(initial, moves)
-    initNode = Node(initial, moves, priority, None)
-    priorityQueue.enqueue(initNode)
+    print(compare(currentBoard))
 
-    while not priorityQueue.isEmpty():
-        node = priorityQueue.dequeue()
-        print("Dequeue priority: ", node.priority)
-        if compare(node.board) == True:
-            break
+    while compare(currentBoard) == False:
+        print("Move: ", moves)
+        print("current board: ")
+        printMatrix(currentBoard)
 
-        neighbourList = generateNeighbours(node.board)
+        childList = generateNeighbours(currentBoard)
         moves += 1
-        for i in range(len(neighbourList)):
-            newNode = Node(neighbourList[i], moves, calculatePriority(neighbourList[i], moves),None)
-            priorityQueue.enqueue(newNode)
 
+        print("Child List:")
+        for i in range(len(childList)):
+            print("Child index: ", i)
+            printMatrix(childList[i])
 
-    print("Moves: ", moves)
+        min = calculatePriority(childList[0], moves)
+        minIndex = 0
+        for i in range(len(childList)):
+            priority = calculatePriority(childList[i], moves)
+            if priority < min:
+                min = priority
+                minIndex = i
+
+        currentBoard = childList[minIndex]
+
+    print("final board")
+    printMatrix(currentBoard)
+
 
 main()

@@ -152,7 +152,7 @@ def calculateManhattanDistance(testBoard, goalBoard):
             x_current, y_current = i, j
             for m in range(len(goalBoard)):
                 for n in range(len(goalBoard[m])):
-                    if item == goalBoard[m][n]:
+                    if item == goalBoard[m][n] and item != 0:
                         x_goal = m
                         y_goal = n
                         # calculating manhattan distance
@@ -170,13 +170,14 @@ def calculateEuclideanDistance(testBoard, goalBoard):
             item = testBoard[i][j]
             for m in range(len(goalBoard)):
                 for n in range(len(goalBoard[m])):
-                    x_goal = m
-                    y_goal = n
-                    # calculating euclidiean distance
-                    a = math.pow((x_current-x_goal), 2)
-                    b = math.pow((y_current-y_goal), 2)
-                    euclidean = math.sqrt(a+b)
-                    totalDistance = totalDistance + euclidean
+                    if item == goalBoard[m][n] and item != 0:
+                        x_goal = m
+                        y_goal = n
+                        # calculating euclidiean distance
+                        a = math.pow((x_current-x_goal), 2)
+                        b = math.pow((y_current-y_goal), 2)
+                        euclidean = math.sqrt(a+b)
+                        totalDistance = totalDistance + euclidean
 
     return totalDistance
                     
